@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# 説明: `top45_codes_20241230.csv` の銘柄について `prices_close_wide.csv` の過去値（PAST_DATE）と現在値を比較して利率・差分を算出する。
+# 入力方法: リポジトリで `top45_codes_20241230.csv` と `prices_close_wide.csv` を準備し `python simulation.py` を実行。
+# 出力されるモノ: `top45_20241230_vs_now_from_prices_close_wide_sorted.txt` に各銘柄の過去値/現在値/差分/利率および合計を保存（標準出力にも表示）。
 
 import re
 from pathlib import Path

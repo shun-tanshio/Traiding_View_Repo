@@ -1,5 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# 説明: 銘柄リスト（txt/csv）を元に各銘柄1株ずつのBUY/SELL損益を計算するCLIスクリプト。
+# 入力方法: `python simulation_onebuy_in_v3.py BUY_DATE SELL_DATE --top <list.txt/csv> --wide prices_close_wide.csv`（日付は YYYY_MM_DD 等）
+# 出力されるモノ: 標準出力に各銘柄の買値/売値/差分/利率と合計を表示（ファイル保存は行わない）。
+# 基本的にこのスクリプトは他のスクリプトから呼び出されることを想定しているので、単体実行はあまり想定していない。
 
 import re
 import sys

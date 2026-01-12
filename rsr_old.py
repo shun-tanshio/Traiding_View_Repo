@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-#これが、過去の期間と年代を絞ってRSRを出すためのコード
-
-# -*- coding: utf-8 -*-
+# 説明: 指定日（またはCSVの最新日）を基準にRSRを計算し、上位銘柄を出力するスクリプト。
+# 入力方法: python rsr_old.py [YYYY_MM_DD] [--csv prices_close_wide.csv]
+# 出力されるモノ: 上位N銘柄を top{N}_tse_YYYYMMDD.txt に保存し、最終行で "YYYY-MM-DD,N" を標準出力に出力。
 
 import sys
 import argparse

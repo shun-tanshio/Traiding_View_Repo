@@ -1,3 +1,7 @@
+# 説明: `rsr_old.py` を実行して生成された銘柄リスト名を受け、`simulation_onebuy_in_v3.py` を呼び出すオーケストレータ。
+# 入力方法: 同ディレクトリで `python simulation_v3.py` を実行（`rsr_old.py` が存在し正常に実行可能であること）。
+# 出力されるモノ: `rsr_old.py` と `simulation_onebuy_in_v3.py` の標準出力を表示し、最後に `prices_close_wide.csv` を用いて日経平均の利益率（%）を標準出力に表示。
+
 import subprocess
 import datetime
 import sys

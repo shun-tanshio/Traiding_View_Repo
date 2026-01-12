@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# 説明: 各銘柄を1株ずつ購入した場合の損益を計算するスクリプト。
+# 入力方法: `top45_codes_20241230.csv` と `prices_close_wide.csv` を準備し `python simulation_一株づつ.py` を実行。
+# 出力されるモノ: `top45_20241230_vs_now_1share_sim_sorted.txt` に各銘柄の購入額・現在評価額・損益・損益率と合計を保存（標準出力にも表示）。
 
 import re
 from pathlib import Path

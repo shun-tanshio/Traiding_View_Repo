@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# これが基準の日にちを入れるとRSR出してくれるやつ
+# 説明: 指定した基準日でRSRを計算し、銘柄別のRSRランキングを表示するスクリプト。
+# 入力方法: `python RSRだけ.py`（内部の `SIM_DATE` を変更するか、スクリプトを編集して日付を指定）。
+# 出力されるモノ: RSRスコア順の一覧を標準出力に表示（データ不足銘柄は除外して表示）。
 import sys
 from typing import Optional, Tuple, List
 

@@ -1,5 +1,8 @@
-# close_wide_1y_manual_list_jp_fixed.py
-# pip install yfinance pandas
+# 説明: 複数銘柄の終値を yfinance から取得してワイド形式CSV (`prices_close_wide.csv`) を作成/更新するスクリプト。
+# 入力方法: リポジトリに置いた本スクリプトを `python3 get_price.py` で実行。
+# 出力されるモノ: `prices_close_wide.csv` を生成/上書き（行=Ticker, 列=YYYY-MM-DD）。取得状況は標準出力に表示。
+
+# こっちはほぼほぼ使わないという感じ
 
 from __future__ import annotations
 import pandas as pd

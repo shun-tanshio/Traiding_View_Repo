@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# 説明: 指定開始日から指定期間（HORIZON_MONTHS）先の利益率とRSRを比較して散布図を作成するスクリプト。
+# 入力方法: `python rsr_prot_pre.py`（内部定数 `START_DATE`, `HORIZON_MONTHS`, `CSV_PATH` を使用）。
+# 出力されるモノ: RSRスコアと将来利益率の散布図をmatplotlibで表示（標準出力は主にエラーや情報）。
 
 from typing import List, Tuple, Optional
 import pandas as pd

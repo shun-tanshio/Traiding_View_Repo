@@ -1,5 +1,6 @@
-# update_missing_closes_until_today.py
-# pip install yfinance pandas
+# 説明: prices_close_wide.csv を yfinance で最新日まで更新するスクリプト。
+# 入力方法: リポジトリルートに `prices_close_wide.csv` を置き、`python add_price.py` を実行。
+# 出力されるモノ: 同名 `prices_close_wide.csv` を上書き保存（UTF-8-SIG、小数2桁）。取得失敗Tickerは標準出力で報告。
 
 from __future__ import annotations
 from pathlib import Path

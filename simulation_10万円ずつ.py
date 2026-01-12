@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# 説明: 各銘柄に対して一定金額（`INVEST_YEN`）ずつ投資した場合の損益シミュレーションを行うスクリプト。
+# 入力方法: `top45_codes_20241230.csv` と `prices_close_wide.csv` を準備し `python simulation_10万円ずつ.py` を実行。
+# 出力されるモノ: `top45_20241230_vs_now_10k_sim_sorted.txt` に各銘柄の購入数/購入額/現在評価額/損益/損益率と合計を保存（標準出力にも表示）。
 
 import re
 import math

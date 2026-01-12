@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# 説明: 過去1年の日次でRSRスコアを計算・プロットするスクリプト（銘柄とベンチマーク比較）。
+# 入力方法: python rsr_daily_1y.py TICKER [--csv prices_close_wide.csv]
+# 出力されるモノ: 日次RSRのグラフをmatplotlibで表示（標準出力は主にエラーや情報）。
 
 import argparse
 from typing import Optional

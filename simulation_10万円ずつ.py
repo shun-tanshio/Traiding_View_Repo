@@ -8,8 +8,8 @@ from pathlib import Path
 import pandas as pd
 
 # ========= 設定 =========
-TOP45_PATH = Path("top45_codes_20241230.csv")
-WIDE_PATH  = Path("prices_close_wide.csv")
+TOP45_PATH = Path("top45_codes_20220315.csv")
+WIDE_PATH  = Path("prices_close_wide_world.csv")
 
 PAST_DATE = pd.Timestamp("2024-12-30")
 

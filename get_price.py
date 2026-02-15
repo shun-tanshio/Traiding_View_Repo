@@ -242,6 +242,7 @@ TICKERS_TEXT = """
 9983.T
 9984.T
 ^N225
+1306.T
 """.strip()
 
 def parse_tickers(text: str) -> list[str]:

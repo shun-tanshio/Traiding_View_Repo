@@ -12,9 +12,9 @@ import exchange_calendars as xcals
 from dateutil.relativedelta import relativedelta
 
 # 固定（必要ならコマンドラインで上書きできます）
-TOP_NUMBER = 40
+TOP_NUMBER = 200
 
-CSV_PATH = "prices_close_wide.csv"
+CSV_PATH = "prices_close_wide_world.csv"
 CAL_NAME = "XTKS"
 
 # ★シミュレーションしたい日（YYYY-MM-DD）

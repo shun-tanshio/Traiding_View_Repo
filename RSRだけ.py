@@ -16,7 +16,7 @@ CAL_NAME = "XTKS"
 # None のときは「CSV最新日」で計算
 # SIM_DATE: Optional[str] = None
 # 例:
-SIM_DATE = "2026/01/10"
+SIM_DATE = "2026/02/0４"
 
 WEIGHTS = {
     "q1": 0.4,

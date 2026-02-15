@@ -7,7 +7,8 @@ from pathlib import Path
 import pandas as pd
 import yfinance as yf
 
-CSV_PATH = Path("prices_close_wide.csv")
+# CSV_PATH = Path("prices_close_wide.csv")
+CSV_PATH = Path("prices_close_wide_world.csv")
 
 INTERVAL = "1d"
 CHUNK_SIZE = 50

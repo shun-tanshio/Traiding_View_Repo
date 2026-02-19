@@ -25,14 +25,16 @@ def get_latest_saved_date(columns: list[str]) -> pd.Timestamp | None:
         return None
     return parsed.max()
 
-def fetch_close_range(tickers: list[str], start: str, end: str) -> tuple[pd.DataFrame, list[str]]:
+def fetch_close_open_range(tickers: list[str], start: str, end: str) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]:
     """
-    期間[start, end) の日足終値を取得して close_wide で返す（縦=Ticker, 横=Date）
+    期間[start, end) の日足終値・始値を取得して返す（縦=Ticker, 横=Date）
     return:
-      new_wide: index=Ticker, columns=YYYY-MM-DD(str), values=Close
+      close_wide: index=Ticker, columns=YYYY-MM-DD(str), values=Close
+      open_wide: index=Ticker, columns=YYYY-MM-DD(str), values=Open
       failed: 取れなかったTicker
     """
-    parts: list[pd.DataFrame] = []
+    close_parts: list[pd.DataFrame] = []
+    open_parts: list[pd.DataFrame] = []
     failed: list[str] = []
 
     for i in range(0, len(tickers), CHUNK_SIZE):
@@ -61,8 +63,9 @@ def fetch_close_range(tickers: list[str], start: str, end: str) -> tuple[pd.Data
 
         try:
             close = data["Close"]
+            open_price = data["Open"]
         except Exception as e:
-            print("【株価取得エラー】'Close' 列の取り出しに失敗しました。")
+            print("【株価取得エラー】'Close' または 'Open' 列の取り出しに失敗しました。")
             print(f"  エラー内容: {repr(e)}")
             failed.extend(chunk)
             continue
@@ -70,6 +73,8 @@ def fetch_close_range(tickers: list[str], start: str, end: str) -> tuple[pd.Data
         # 1銘柄だとSeriesになることがある
         if isinstance(close, pd.Series):
             close = close.to_frame(name=chunk[0])
+        if isinstance(open_price, pd.Series):
+            open_price = open_price.to_frame(name=chunk[0])
 
         if close.empty:
             print("【注意】Closeが空でした。")
@@ -85,22 +90,31 @@ def fetch_close_range(tickers: list[str], start: str, end: str) -> tuple[pd.Data
 
         # 日付を "YYYY-MM-DD" に統一
         close.index = pd.to_datetime(close.index).strftime("%Y-%m-%d")
+        open_price.index = pd.to_datetime(open_price.index).strftime("%Y-%m-%d")
 
-        wide = close.T  # 行=Ticker, 列=Date
+        close_wide = close.T  # 行=Ticker, 列=Date
+        open_wide = open_price.T  # 行=Ticker, 列=Date
 
         # 全部NaNのTickerは失敗扱い
-        all_nan = wide.isna().all(axis=1)
-        failed.extend(wide.index[all_nan].tolist())
-        wide = wide.loc[~all_nan]
+        all_nan = close_wide.isna().all(axis=1)
+        failed.extend(close_wide.index[all_nan].tolist())
+        close_wide = close_wide.loc[~all_nan]
+        open_wide = open_wide.loc[~all_nan]
 
-        parts.append(wide)
+        close_parts.append(close_wide)
+        open_parts.append(open_wide)
 
-    out = pd.concat(parts, axis=0) if parts else pd.DataFrame()
-    out = out[~out.index.duplicated(keep="first")]
-    out = out.sort_index()
-    out = out.reindex(sorted(out.columns), axis=1)
+    close_out = pd.concat(close_parts, axis=0) if close_parts else pd.DataFrame()
+    close_out = close_out[~close_out.index.duplicated(keep="first")]
+    close_out = close_out.sort_index()
+    close_out = close_out.reindex(sorted(close_out.columns), axis=1)
 
-    return out, sorted(set(map(str, failed)))
+    open_out = pd.concat(open_parts, axis=0) if open_parts else pd.DataFrame()
+    open_out = open_out[~open_out.index.duplicated(keep="first")]
+    open_out = open_out.sort_index()
+    open_out = open_out.reindex(sorted(open_out.columns), axis=1)
+
+    return close_out, open_out, sorted(set(map(str, failed)))
 
 def calculate_rsi_ma(df_price: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
@@ -170,15 +184,16 @@ def main():
 
     print(f"【更新範囲】CSV最新日付: {latest_str} → 追加取得: {start} 〜 {today.strftime('%Y-%m-%d')}")
 
-    new_wide, failed = fetch_close_range(tickers, start=start, end=end)
+    new_close, new_open, failed = fetch_close_open_range(tickers, start=start, end=end)
 
     # ★重要：yfinanceが「開始日以降データ無し」でも直前日を返すことがあるため、
     # 「CSV最新日付より後」だけを追加扱いにする
-    if not new_wide.empty:
-        new_cols = [c for c in new_wide.columns if c > latest_str]
-        new_wide = new_wide.reindex(columns=new_cols)
+    if not new_close.empty:
+        new_cols = [c for c in new_close.columns if c > latest_str]
+        new_close = new_close.reindex(columns=new_cols)
+        new_open = new_open.reindex(columns=new_cols)
 
-    if new_wide.empty:
+    if new_close.empty:
         print("【完了】追加できる新しい取引日がありません。")
         print(f"  CSV最新日付: {latest_str}")
         print("  休場日・週末・引け前実行などが原因の可能性があります。")
@@ -191,21 +206,36 @@ def main():
     merged = df.copy()
 
     # 列を拡張
-    all_cols = sorted(set(merged.columns).union(new_wide.columns))
+    all_cols = sorted(set(merged.columns).union(new_close.columns))
     merged = merged.reindex(columns=all_cols)
 
     # 値を反映（同じ日付があれば上書き）
-    merged.update(new_wide)
+    merged.update(new_close)
 
     # 保存（小数2桁固定）
     merged.to_csv(CSV_PATH, encoding="utf-8-sig", float_format="%.2f")
 
     print(f"【保存】CSVを更新しました: {CSV_PATH}")
-    print(f"【結果】追加取得できた日付列数: {len(new_wide.columns)}（{new_wide.columns[0]} … {new_wide.columns[-1]}）")
+    print(f"【結果】追加取得できた日付列数: {len(new_close.columns)}（{new_close.columns[0]} … {new_close.columns[-1]}）")
 
     if failed:
         print("【注意】取得できなかった可能性のあるTicker:")
         print("  " + ", ".join(failed[:50]) + (" …" if len(failed) > 50 else ""))
+
+    # ===== 始値も保存 =====
+    open_csv_path = Path("prices_open_wide.csv")
+    if not open_csv_path.exists():
+        # 初めての場合、新規作成
+        new_open.to_csv(open_csv_path, encoding="utf-8-sig", float_format="%.2f")
+        print(f"【保存】{open_csv_path} を新規作成しました")
+    else:
+        # 既存ファイルがある場合、更新
+        open_df = pd.read_csv(open_csv_path, index_col=0)
+        all_cols = sorted(set(open_df.columns).union(new_open.columns))
+        open_df = open_df.reindex(columns=all_cols)
+        open_df.update(new_open)
+        open_df.to_csv(open_csv_path, encoding="utf-8-sig", float_format="%.2f")
+        print(f"【保存】{open_csv_path} を更新しました")
 
     # ===== RSI・MA20を計算して保存 =====
     print("\n【計算中】RSI・MA20を計算中...")

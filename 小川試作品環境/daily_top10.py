@@ -23,6 +23,7 @@ import sys
 import pandas as pd
 
 CSV = "prices_close_wide.csv"
+MAPPING_CSV = "ticker_company_mapping.csv"
 
 
 def load_prices(path: str) -> pd.DataFrame:
@@ -37,7 +38,14 @@ def load_prices(path: str) -> pd.DataFrame:
     return df
 
 
-def compute_top_lists(df: pd.DataFrame, n: int = 10) -> None:
+def load_mapping(path: str) -> dict[str, str]:
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"マッピングファイルが見つかりません: {path}")
+    df = pd.read_csv(path)
+    return dict(zip(df['コード'].astype(str), df['社名']))
+
+
+def compute_top_lists(df: pd.DataFrame, mapping: dict[str, str], n: int = 10) -> None:
     # 直近2日のみ抜き出す
     if df.shape[1] < 2:
         print("データが2日分未満です。CSV を更新してください。")
@@ -56,7 +64,12 @@ def compute_top_lists(df: pd.DataFrame, n: int = 10) -> None:
 
     def print_list(title: str, series: pd.Series):
         print(f"=== {title} ===")
-        print(series.head(n).to_string())
+        # 企業名に置き換え
+        series.index = series.index.map(lambda x: mapping.get(str(x).replace('.T', ''), str(x)))
+        for i in range(min(n, len(series))):
+            company = series.index[i]
+            value = series.iloc[i]
+            print(f"{company:<30}\t{value:>10.2f}")
         print()
 
     # 上がり％トップ10
@@ -79,8 +92,9 @@ def compute_top_lists(df: pd.DataFrame, n: int = 10) -> None:
 if __name__ == "__main__":
     try:
         prices = load_prices(CSV)
+        mapping = load_mapping(MAPPING_CSV)
     except Exception as e:
         print("エラー:", e)
         sys.exit(1)
 
-    compute_top_lists(prices)
+    compute_top_lists(prices, mapping)
